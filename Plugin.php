@@ -41,8 +41,8 @@ class Plugin extends PluginBase
     public function boot()
     {
         \Event::listen("backend.beforeRoute", function () {
-            \Route::any(\Backend::uri() . "/backend/auth/{slug?}", function () {
-                return \Redirect::to(\Backend::url("crazy/backend/auth"));
+            \Route::any(\Backend::uri() . "/backend/auth/{slug?}", function ($slug = '') {
+                return \Redirect::to(\Backend::url("crazy/backend/auth/$slug"));
             });
         });
     }
