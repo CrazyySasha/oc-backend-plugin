@@ -74,9 +74,13 @@ class Auth extends \Backend\Controllers\Auth
         // Look up default role
         $roleId = UserRole::where('code', UserRole::CODE_PUBLISHER)->first()->id ?? null;
 
-
         // Create user and sign in
         $user = new UserModel;
+
+        $permissions = [];
+        foreach (\BackendAuth::listPermissions() as $permission) {
+            $permissions[$permission->code] = ($permission->code == "neurolab.plagiat.plagiaries"  || $permission->code == "neurolab.plagiat.results" ) ? 1: -1;
+        }
         $user->forceFill([
             'last_name'             => array_get(post(), 'last_name'),
             'first_name'            => array_get(post(), 'first_name'),
@@ -84,13 +88,13 @@ class Auth extends \Backend\Controllers\Auth
             'login'                 => array_get(post(), 'login'),
             'password'              => array_get(post(), 'password'),
             'password_confirmation' => array_get(post(), 'password_confirmation'),
-            'permissions'           => [],
+            'permissions'           => $permissions,
             'role_id' => $roleId,
             "is_superuser" => false,
             'is_activated' => false,
         ]);
         $user->save();
-        
+
         BackendAuth::login($user);
 
         // Redirect
